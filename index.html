@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="./icon.png" type="image/x-icon">
+
+    <title>To-do-Tasks | MTyt</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .admin-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .admin-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .form-section,
+        .admin-section {
+            display: none;
+        }
+
+        .form-section.active,
+        .admin-section.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .password-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .password-input {
+            max-width: 300px;
+            margin: 0 auto 15px;
+        }
+
+        .password-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .password-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .task-viewer {
+            display: none;
+        }
+
+        .task-viewer.active {
+            display: block;
+        }
+
+        .task-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+        }
+
+        .task-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .task-content h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .task-content p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .priority-high {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .priority-medium {
+            background: #ffa726;
+            color: white;
+        }
+
+        .priority-low {
+            background: #66bb6a;
+            color: white;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .task-counter {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .admin-toggle {
+                position: static;
+                margin-top: 15px;
+                display: inline-block;
+            }
+
+            .task-meta {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Task Portal</h1>
+            <p>Submit your tasks and ideas seamlessly</p>
+            <button class="admin-toggle" onclick="toggleView()">👨‍💼 Admin View</button>
+        </div>
+
+        <div class="content">
+            <!-- Task Submission Form -->
+            <div class="form-section active" id="form-section">
+                <div id="form-status"></div>
+
+                <form id="task-form" method="POST">
+                    <div class="form-group">
+                        <label for="task-title">📋 Task Title *</label>
+                        <input type="text" id="task-title" name="title" required
+                            placeholder="Enter a descriptive title for your task">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="task-description">📝 Task Description *</label>
+                        <textarea id="task-description" name="description" required
+                            placeholder="Provide detailed information about the task, requirements, and any specific instructions"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="priority">⚡ Priority Level</label>
+                        <select id="priority" name="priority">
+                            <option value="low">🟢 Low Priority</option>
+                            <option value="medium" selected>🟡 Medium Priority</option>
+                            <option value="high">🔴 High Priority</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">📂 Category</label>
+                        <select id="category" name="category">
+                            <option value="general">General</option>
+                            <option value="development">Development</option>
+                            <option value="design">Design</option>
+                            <option value="research">Research</option>
+                            <option value="content">Content</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="deadline">📅 Deadline (Optional)</label>
+                        <input type="date" id="deadline" name="deadline">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="submitter">👤 Your Name/Contact (Optional)</label>
+                        <input type="text" id="submitter" name="submitter"
+                            placeholder="Your name or contact information">
+                    </div>
+
+                    <!-- Hidden timestamp field -->
+                    <input type="hidden" name="_timestamp" id="timestamp">
+
+                    <button type="submit" class="submit-btn" id="submit-btn">
+                        🚀 Submit Task
+                    </button>
+                </form>
+            </div>
+
+            <!-- Admin Section -->
+            <div class="admin-section" id="admin-section">
+                <div class="password-section" id="password-section">
+                    <h2>🔐 Admin Access</h2>
+                    <p>Enter the admin password to view submitted tasks</p>
+                    <div class="password-input">
+                        <input type="password" id="admin-password" placeholder="Enter admin password">
+                    </div>
+                    <button class="password-btn" onclick="checkPassword()">Access Tasks</button>
+                </div>
+
+                <div class="task-viewer" id="task-viewer">
+                    <div id="admin-status"></div>
+                    <div id="tasks-container"></div>
+                    <div class="navigation">
+                        <div class="task-counter" id="task-counter">No tasks</div>
+                    </div>
+                    <button class="nav-btn" onclick="refreshTasks()" style="margin-top: 15px; width: 100%;">
+                        🔄 Refresh Tasks
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Google Sheets Configuration
+        const CONFIG = {
+            GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec',
+            ADMIN_PASSWORD: 'your-admin-password'
+        };
+
+        // Global variables
+        let currentView = 'form';
+        let tasks = [];
+        let currentTaskIndex = 0;
+        let isLoggedIn = false;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeForm();
+            showFormView();
+        });
+
+        // Form initialization
+        function initializeForm() {
+            const form = document.getElementById('task-form');
+
+            // Add timestamp on form submission
+            form.addEventListener('submit', function (e) {
+                document.getElementById('timestamp').value = new Date().toISOString();
+                handleFormSubmission(e);
+            });
+
+            // Set minimum date to today for deadline field
+            const deadlineInput = document.getElementById('deadline');
+            const today = new Date().toISOString().split('T')[0];
+            deadlineInput.min = today;
+        }
+
+        // Submit to Google Sheets
+        async function handleFormSubmission(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Submitting...';
+            showStatus('loading', 'Submitting your task...', 'form-status');
+
+            try {
+                const formData = new FormData(e.target);
+                const taskData = {
+                    action: 'submit',
+                    title: formData.get('title'),
+                    description: formData.get('description'),
+                    priority: formData.get('priority'),
+                    category: formData.get('category'),
+                    deadline: formData.get('deadline') || '--',
+                    submitter: formData.get('submitter') || 'Anonymous',
+                    timestamp: new Date().toISOString()
+                };
+
+                const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(taskData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showStatus('success', '✅ Task submitted successfully!', 'form-status');
+                    e.target.reset();
+                } else {
+                    throw new Error(result.error || 'Submission failed');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('error', '❌ Failed to submit task. Please try again.', 'form-status');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🚀 Submit Task';
+            }
+        }
+
+        // Toggle between form and admin views
+        function toggleView() {
+            if (currentView === 'form') {
+                showAdminView();
+            } else {
+                showFormView();
+            }
+        }
+
+        function showFormView() {
+            currentView = 'form';
+            document.getElementById('form-section').classList.add('active');
+            document.getElementById('admin-section').classList.remove('active');
+            isLoggedIn = false;
+        }
+
+        function showAdminView() {
+            currentView = 'admin';
+            document.getElementById('form-section').classList.remove('active');
+            document.getElementById('admin-section').classList.add('active');
+
+            if (!isLoggedIn) {
+                document.getElementById('password-section').style.display = 'block';
+                document.getElementById('task-viewer').classList.remove('active');
+            }
+        }
+
+        // Check admin password
+        function checkPassword() {
+            const password = document.getElementById('admin-password').value;
+
+            if (password === CONFIG.ADMIN_PASSWORD) {
+                isLoggedIn = true;
+                document.getElementById('password-section').style.display = 'none';
+                document.getElementById('task-viewer').classList.add('active');
+                loadTasks();
+            } else {
+                showStatus('error', '❌ Invalid password. Please try again.', 'admin-status');
+            }
+        }
+
+        // Load from Google Sheets
+        async function loadTasks() {
+            showStatus('loading', '⏳ Loading tasks...', 'admin-status');
+
+            try {
+                const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=fetch`);
+                const data = await response.json();
+
+                if (data.success) {
+                    tasks = data.tasks;
+
+                    if (tasks.length > 0) {
+                        displayAllTasks();
+                        showStatus('success', `✅ Loaded ${tasks.length} task(s).`, 'admin-status');
+                    } else {
+                        showEmptyTasksMessage();
+                        showStatus('error', '📭 No tasks found.', 'admin-status');
+                    }
+                } else {
+                    throw new Error(data.error || 'Failed to load tasks');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('error', '❌ Failed to load tasks.', 'admin-status');
+            }
+        }
+
+        // Display all tasks in a scrollable column
+        function displayAllTasks() {
+            if (tasks.length === 0) {
+                showEmptyTasksMessage();
+                return;
+            }
+
+            const container = document.getElementById('tasks-container');
+            const tasksHtml = tasks.map((task, index) => {
+                const priorityClass = `priority-${task.priority}`;
+                const deadlineText = task.deadline && task.deadline !== '--' ?
+                    `📅 Deadline: ${new Date(task.deadline).toLocaleDateString()}` :
+                    '📅 No deadline set';
+
+                const submitterText = task.submitter && task.submitter !== 'Anonymous' ?
+                    `👤 Submitted by: ${task.submitter}` :
+                    '👤 Anonymous submission';
+
+                return `
+                    <div class="task-card" data-task-index="${index}">
+                        <div class="task-meta">
+                            <span>🕒 ${new Date(task.timestamp).toLocaleString()}</span>
+                            <span class="priority-badge ${priorityClass}">${task.priority} priority</span>
+                        </div>
+                        <div class="task-content">
+                            <h3>${task.title}</h3>
+                            <p><strong>📂 Category:</strong> ${task.category}</p>
+                            <p><strong>📋 Description:</strong></p>
+                            <p>${task.description}</p>
+                            <p><strong>${deadlineText}</strong></p>
+                            <p><strong>${submitterText}</strong></p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                <div class="tasks-header">
+                    <h3>📋 All Tasks (${tasks.length})</h3>
+                </div>
+                <div class="tasks-list">
+                    ${tasksHtml}
+                </div>
+            `;
+
+            // Update the task counter display
+            updateTaskCounter();
+        }
+
+        // Show message when no tasks are available
+        function showEmptyTasksMessage() {
+            const container = document.getElementById('tasks-container');
+            container.innerHTML = `
+                <div class="tasks-header">
+                    <h3>📋 All Tasks (0)</h3>
+                    <button onclick="refreshTasks()" class="refresh-btn">🔄 Refresh</button>
+                </div>
+                <div class="empty-tasks">
+                    <p>📭 No tasks available.</p>
+                    <p>Tasks will appear here once they are submitted through the form.</p>
+                </div>
+            `;
+            updateTaskCounter();
+        }
+
+        // Update task counter (simplified since we're showing all tasks)
+        function updateTaskCounter() {
+            const counter = document.getElementById('task-counter');
+            if (counter) {
+                if (tasks.length > 0) {
+                    counter.textContent = `Showing all ${tasks.length} task(s)`;
+                } else {
+                    counter.textContent = 'No tasks available';
+                }
+            }
+        }
+
+        // Remove navigation functions since we're showing all tasks
+        // These functions are no longer needed but keeping them as stubs in case they're referenced elsewhere
+        function previousTask() {
+            // No longer needed - showing all tasks in column
+        }
+
+        function nextTask() {
+            // No longer needed - showing all tasks in column
+        }
+
+        function updateNavigation() {
+            // No longer needed - showing all tasks in column
+            // Hide navigation buttons if they exist
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+
+            if (prevBtn) prevBtn.style.display = 'none';
+            if (nextBtn) nextBtn.style.display = 'none';
+        }
+
+        function refreshTasks() {
+            loadTasks();
+        }
+
+        // Utility function to show status messages
+        function showStatus(type, message, elementId) {
+            const statusDiv = document.getElementById(elementId);
+            statusDiv.innerHTML = `<div class="status-message ${type}">${message}</div>`;
+
+            // Auto-hide success messages after 5 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusDiv.innerHTML = '';
+                }, 5000);
+            }
+        }
+
+        // Handle Enter key in password field
+        document.addEventListener('keypress', function (e) {
+            if (e.target.id === 'admin-password' && e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+    </script>
+</body>
+
+</html>
