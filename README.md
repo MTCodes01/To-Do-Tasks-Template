@@ -14,6 +14,23 @@ Follow these steps to set up the Google Sheet and deploy the web app:
 - Note down the **Sheet ID** from the URL:  
   Format: `https://docs.google.com/spreadsheets/d/**<your-sheet-id>**/edit`
 
+## 🗂️ Google Sheet Structure
+
+Make sure your Google Sheet contains the following **columns** in this exact order for the integration to work properly:
+
+| Timestamp         | Title          | Description        | Priority | Category       | Deadline        | Submitter      |
+|------------------|----------------|--------------------|----------|----------------|-----------------|----------------|
+| Auto-generated   | Task title     | Task details       | High/Med/Low | Deployment,Design/etc. | YYYY-MM-DD      | Name or Email  |
+
+### 📌 Notes:
+- **Timestamp** will be auto-generated using the Apps Script (e.g., `new Date()`).
+- **Title** and **Description** describe the task clearly.
+- **Priority** can be values like `High`, `Medium`, or `Low`.
+- **Category** can be any tag or group like `Work`, `Personal`, etc.
+- **Deadline** should follow the format `YYYY-MM-DD`.
+- **Submitter** can be the name or email of the person submitting the task.
+
+
 ### 2. **Copy the Google Apps Script**
 - Open the script editor: `Extensions > Apps Script`
 - Paste the provided Apps Script code.
